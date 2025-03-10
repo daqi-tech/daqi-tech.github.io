@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>国债逆回购</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.16.13/antd.min.css">
+    <style>
+        .red { color: red; }
+        .green { color: green; }
+        .subtitle { font-size: 24px; font-weight: bold; margin-bottom: 20px; }
+        .table-container { margin-bottom: 40px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="subtitle">国债逆回购</div>
+        <div class="table-container">
+            <div>沪市</div>
+            <table id="shTable" class="ant-table">
+                <thead class="ant-table-thead">
+                    <tr>
+                        <th>名称</th>
+                        <th>最新价</th>
+                        <th>最高</th>
+                        <th>最低</th>
+                    </tr>
+                </thead>
+                <tbody class="ant-table-tbody"></tbody>
+            </table>
+        </div>
+        <div class="table-container">
+            <div>深市</div>
+            <table id="szTable" class="ant-table">
+                <thead class="ant-table-thead">
+                    <tr>
+                        <th>名称</th>
+                        <th>最新价</th>
+                        <th>最高</th>
+                        <th>最低</th>
+                    </tr>
+                </thead>
+                <tbody class="ant-table-tbody"></tbody>
+            </table>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        const red = 'red';
+        const green = 'green';
+        const shApi = 'https://5.push2.eastmoney.com/api/qt/clist/get?pn=1&pz=20&po=1&np=1&fltt=2&invt=2&dect=1&wbp2u=4712365547389930|0|1|0|web&fid=f2&fs=m:1+b:MK0356&fields=f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f12,f13,f14,f15,f16,f17,f18,f20,f21,f23,f24,f25,f26,f22,f33,f11,f62,f128,f136,f115,f152';
+        const szApi = 'https://5.push2.eastmoney.com/api/qt/clist/get?pn=1&pz=20&po=1&np=1&fltt=2&invt=2&dect=1&wbp2u=4712365547389930|0|1|0|web&fid=f2&fs=m:0+b:MK0356&fields=f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f12,f13,f14,f15,f16,f17,f18,f20,f21,f23,f24,f25,f26,f22,f33,f11,f62,f128,f136,f115,f152';
+
+        function renderTable(data, tableId) {
+            const tableBody = document.getElementById(tableId).querySelector('tbody');
+            tableBody.innerHTML = data.map(record => `
+                <tr>
+                    <td>${record.f14}</td>
+                    <td><span class="${record.f4 > 0 ? red : green}">${record.f2}</span></td>
+                    <td><span class="${red}">${record.f15}</span></td>
+                    <td><span class="${green}">${record.f16}</span></td>
+                </tr>
+            `).join('');
+        }
+
+        axios.get(shApi).then(response => {
+            renderTable(response.data.data.diff, 'shTable');
+        });
+
+        axios.get(szApi).then(response => {
+            renderTable(response.data.data.diff, 'szTable');
+        });
+    </script>
+</body>
+</html>
